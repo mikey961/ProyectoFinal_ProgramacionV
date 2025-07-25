@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:padding="24dp"
+    tools:context=".Fragmentos.Registro.LoginFragment">
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/roleLayout"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Selecciona una opción"
+        android:layout_marginTop="8dp"
+        app:endIconMode="dropdown_menu"
+        app:boxCornerRadiusTopStart="12dp"
+        app:boxCornerRadiusTopEnd="12dp"
+        app:boxCornerRadiusBottomStart="12dp"
+        app:boxCornerRadiusBottomEnd="12dp">
+
+        <com.google.android.material.textfield.MaterialAutoCompleteTextView
+            android:id="@+id/roleInput"
+            android:layout_width="363dp"
+            android:layout_height="50dp"
+            android:paddingStart="12dp"
+            android:inputType="text" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/emailLayout"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Correo Electronico"
+        android:textColorHint="@color/black"
+        android:layout_marginTop="18dp"
+        app:boxCornerRadiusTopStart="12dp"
+        app:boxCornerRadiusTopEnd="12dp"
+        app:boxCornerRadiusBottomStart="12dp"
+        app:boxCornerRadiusBottomEnd="12dp">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/emailInput"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="textEmailAddress"/>
+    </com.google.android.material.textfield.TextInputLayout>
+    
+    <TextView
+        android:id="@+id/emailError"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textColor="@color/Rojo"
+        android:textSize="12sp"
+        android:visibility="gone"
+        android:layout_marginTop="4dp"/>
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/passwordLayout"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Contraseña"
+        android:textColorHint="@color/black"
+        android:layout_marginTop="24dp"
+        app:endIconMode="password_toggle"
+        app:endIconTint="@color/black"
+        app:boxCornerRadiusTopStart="12dp"
+        app:boxCornerRadiusTopEnd="12dp"
+        app:boxCornerRadiusBottomStart="12dp"
+        app:boxCornerRadiusBottomEnd="12dp">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/passwordInput"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="textPassword"/>
+    </com.google.android.material.textfield.TextInputLayout>
+    
+    <TextView
+        android:id="@+id/forgotPassword"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="¿Olvidaste tu contraseña?"
+        android:textColor="@color/black"
+        android:textStyle="bold"
+        android:layout_marginTop="8dp"
+        android:layout_gravity="end"
+        android:clickable="true"
+        android:focusable="true"/>
+
+    <TextView
+        android:id="@+id/passwordError"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textColor="@color/Rojo"
+        android:textSize="12sp"
+        android:visibility="gone"
+        android:layout_marginTop="4dp"/>
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/loginButton"
+        style="@style/Widget.MaterialComponents.Button"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:text="Log-in"
+        android:textAllCaps="false"
+        android:layout_marginTop="24dp"
+        app:cornerRadius="16dp"
+        android:backgroundTint="@color/Verde_Oscuro"
+        android:textColor="@color/white"
+        android:textStyle="bold"/>
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/volverButton"
+        style="@style/Widget.MaterialComponents.Button"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:text="Back"
+        android:textAllCaps="false"
+        android:layout_marginTop="2dp"
+        app:cornerRadius="16dp"
+        android:backgroundTint="@android:color/black"
+        android:textColor="@color/white"
+        android:textStyle="bold"/>
+</LinearLayout>

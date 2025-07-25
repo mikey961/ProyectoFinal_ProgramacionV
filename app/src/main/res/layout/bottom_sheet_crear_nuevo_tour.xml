@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/rootSroll"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:fillViewport="true"
+    android:padding="24dp"
+    android:background="@color/white">
+
+    <LinearLayout
+        android:id="@+id/contentLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/tvTituloCrearTour"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Crear nuevo Tour"
+            android:textSize="28sp"
+            android:textStyle="bold"
+            android:textAlignment="center"
+            android:textColor="@color/black"
+            android:layout_marginBottom="16dp"/>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/til_TipoTour"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Tipo de Tour"
+            app:endIconMode="dropdown_menu"
+            app:boxCornerRadiusTopStart="12dp"
+            app:boxCornerRadiusTopEnd="12dp"
+            app:boxCornerRadiusBottomStart="12dp"
+            app:boxCornerRadiusBottomEnd="12dp">
+            
+            <com.google.android.material.textfield.MaterialAutoCompleteTextView
+                android:id="@+id/actv_TipoTour"
+                android:layout_width="360dp"
+                android:layout_height="50dp"
+                android:inputType="text"
+                android:paddingStart="12dp"/>
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <include
+            android:id="@+id/i_selectCuadracicloTour"
+            layout="@layout/layout_cuadraciclo_tour"
+            android:visibility="gone"/>
+
+        <include
+            android:id="@+id/i_selectHorasExtraCaballo"
+            layout="@layout/layout_caballo_tour"
+            android:visibility="gone"/>
+
+        <include
+            android:id="@+id/i_selectHorasExtraCaminata"
+            layout="@layout/layout_caminata_guiada"
+            android:visibility="gone"/>
+        
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="end"
+            android:layout_marginTop="25dp">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/buttonCancelar"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Cancelar"
+                android:textAllCaps="false"
+                android:textSize="16dp"
+                android:textStyle="bold"
+                android:textColor="@color/white"
+                android:backgroundTint="@android:color/holo_red_dark"
+                app:cornerRadius="16dp"
+                android:layout_marginEnd="8dp"/>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/buttonGuardarTour"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Guardar tour"
+                android:textAllCaps="false"
+                android:textSize="16dp"
+                android:textStyle="bold"
+                android:textColor="@color/white"
+                android:backgroundTint="@color/Anaranjado"
+                app:cornerRadius="16dp"/>
+        </LinearLayout>
+    </LinearLayout>
+</ScrollView>

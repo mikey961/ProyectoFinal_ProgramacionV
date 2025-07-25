@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".Activities.Generales.MainActivity">
+
+    <!-- Imagen de fondo (Jaguar) -->
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:src="@drawable/img_fondo"
+        android:scaleType="centerCrop"/>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#80000000" />
+
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:src="@drawable/img_logo"
+        android:adjustViewBounds="true"
+        android:maxHeight="300dp"
+        android:scaleType="fitCenter"
+        android:layout_marginHorizontal="20dp"/>
+
+    <Button
+        android:id="@+id/loginButon"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Log in"
+        android:layout_margin="32dp"
+        android:layout_alignParentBottom="true"
+        android:backgroundTint="@color/Verde"
+        android:textColor="@color/white"
+        android:elevation="8dp"
+        android:textStyle="bold"
+        android:textSize="20dp"
+        android:visibility="gone"/>
+</RelativeLayout>

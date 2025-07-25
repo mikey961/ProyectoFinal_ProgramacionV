@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "855041236782",
+    "project_id": "proyectoprogramacionv-2b764",
+    "storage_bucket": "proyectoprogramacionv-2b764.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:855041236782:android:86dc3a23b011e58458e4bf",
+        "android_client_info": {
+          "package_name": "com.universidad.prograv.proyecto_programacionv"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB-TPXqESz10lEEPUk_pl5QX6zRjKdXWEs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
