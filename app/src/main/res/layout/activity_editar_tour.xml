@@ -13,16 +13,47 @@
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:padding="16dp">
-
-        <ImageView
-            android:id="@+id/iv_ImagenCabeceraTour"
+        
+        <FrameLayout
             android:layout_width="match_parent"
-            android:layout_height="200dp"
-            android:scaleType="centerCrop"
-            android:contentDescription="Imagen del tour"/>
+            android:layout_height="250dp">
+
+            <ImageView
+                android:id="@+id/iv_ImagenCabeceraTour"
+                android:layout_width="match_parent"
+                android:layout_height="200dp"
+                android:scaleType="centerCrop"
+                android:layout_marginTop="55dp"
+                android:contentDescription="Imagen del tour"
+                android:clickable="false"
+                android:focusable="false"
+                android:importantForAccessibility="no"/>
+
+            <TextView
+                android:id="@+id/tv_tituloEditarTour"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:gravity="center"
+                android:text="Editar tour"
+                android:textSize="22dp"
+                android:textStyle="bold" />
+        </FrameLayout>
+
+        <TextView
+            android:id="@+id/tv_TipoTour"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Tipo de tour"
+            android:textSize="16sp"
+            android:textColor="@color/black"
+            android:textStyle="bold"
+            android:paddingStart="8dp"
+            android:paddingTop="8dp"
+            android:paddingBottom="8dp" />
 
         <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/til_NombreTour"
+            android:id="@+id/til_NombreTourEditar"
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -34,13 +65,15 @@
             app:boxCornerRadiusBottomEnd="12dp">
 
             <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/tiet_NombreTour"
+                android:id="@+id/tiet_NombreTourEditar"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"/>
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:enabled="false"/>
         </com.google.android.material.textfield.TextInputLayout>
 
         <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/til_DescriptionTour"
+            android:id="@+id/til_DescriptionTourEditar"
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -52,16 +85,17 @@
             app:boxCornerRadiusBottomEnd="12dp">
 
             <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/tiet_DescriptionTour"
+                android:id="@+id/tiet_DescriptionTourEditar"
                 android:layout_width="match_parent"
                 android:layout_height="150dp"
                 android:gravity="top|start"
                 android:inputType="textMultiLine"
-                android:minLines="4"/>
+                android:minLines="4"
+                android:enabled="false"/>
         </com.google.android.material.textfield.TextInputLayout>
 
         <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/til_DuracionTour"
+            android:id="@+id/til_DuracionTourEditar"
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -73,13 +107,14 @@
             app:boxCornerRadiusBottomEnd="12dp">
 
             <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/tiet_DuracionTour"
+                android:id="@+id/tiet_DuracionTourEditar"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"/>
+                android:layout_height="wrap_content"
+                android:enabled="false"/>
         </com.google.android.material.textfield.TextInputLayout>
 
         <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/til_CantidadVehiculoPesado"
+            android:id="@+id/til_CantidadVehiculoPesadosEditar"
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -91,10 +126,11 @@
             app:boxCornerRadiusBottomEnd="12dp">
 
             <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/tiet_CantidadVehiculosPesados"
+                android:id="@+id/tiet_CantidadVehiculosPesadosEditar"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:inputType="number"/>
+                android:inputType="number"
+                android:enabled="false"/>
         </com.google.android.material.textfield.TextInputLayout>
 
         <TextView
@@ -107,7 +143,7 @@
             android:layout_marginTop="16dp"/>
 
         <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/til_TourPrecioIndividual"
+            android:id="@+id/til_TourPrecioIndividualEditar"
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -119,14 +155,15 @@
             app:boxCornerRadiusBottomEnd="12dp">
 
             <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/tiet_TourPrecioIndividual"
+                android:id="@+id/tiet_TourPrecioIndividualEditar"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:inputType="numberDecimal"/>
+                android:inputType="numberDecimal"
+                android:enabled="false"/>
         </com.google.android.material.textfield.TextInputLayout>
 
         <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/til_TourPrecioDoble"
+            android:id="@+id/til_TourPrecioDobleEditar"
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -138,10 +175,11 @@
             app:boxCornerRadiusBottomEnd="12dp">
 
             <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/tiet_TourPrecioDoble"
+                android:id="@+id/tiet_TourPrecioDobleEditar"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:inputType="numberDecimal"/>
+                android:inputType="numberDecimal"
+                android:enabled="false"/>
         </com.google.android.material.textfield.TextInputLayout>
 
         <TextView
@@ -154,24 +192,73 @@
             android:layout_marginTop="16dp"/>
 
         <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/til_fechaTour"
+            android:id="@+id/til_fechaTourEdiatar"
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
             android:hint="Fecha para el tour"
+            app:endIconMode="custom"
+            app:endIconDrawable="@drawable/ic_calendar"
             app:boxCornerRadiusTopStart="12dp"
             app:boxCornerRadiusTopEnd="12dp"
             app:boxCornerRadiusBottomStart="12dp"
             app:boxCornerRadiusBottomEnd="12dp">
 
             <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/tiet_FechaTour"
+                android:id="@+id/tiet_FechaTourEditar"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:clickable="true"
                 android:focusable="false"
-                android:inputType="none" />
+                android:enabled="false"/>
         </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/til_HorasTour"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:hint="Horas del tour"
+            app:endIconMode="dropdown_menu"
+            app:boxCornerRadiusTopStart="12dp"
+            app:boxCornerRadiusTopEnd="12dp"
+            app:boxCornerRadiusBottomStart="12dp"
+            app:boxCornerRadiusBottomEnd="12dp">
+
+            <com.google.android.material.textfield.MaterialAutoCompleteTextView
+                android:id="@+id/mactv_HorasTourEditar"
+                android:layout_width="match_parent"
+                android:paddingStart="15dp"
+                android:layout_height="55dp"
+                android:focusable="false"
+                android:inputType="none"/>
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/buttonModificar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Modificar"
+            android:textAllCaps="false"
+            android:layout_marginTop="24dp"
+            app:cornerRadius="16dp"
+            android:backgroundTint="@color/Anaranjado"
+            android:textColor="@color/white"
+            android:textStyle="bold"
+            android:textSize="16dp"/>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/buttonVolver"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Volver"
+            android:textAllCaps="false"
+            android:textSize="16dp"
+            android:textStyle="bold"
+            android:layout_marginTop="12dp"
+            android:backgroundTint="@color/black"
+            android:textColor="@android:color/white"
+            app:cornerRadius="16dp"/>
     </LinearLayout>
 </ScrollView>

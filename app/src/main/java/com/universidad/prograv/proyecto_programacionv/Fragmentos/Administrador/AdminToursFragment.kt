@@ -26,6 +26,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
 import com.google.firebase.firestore.FirebaseFirestore
+import com.universidad.prograv.proyecto_programacionv.Activities.Administrador.EditarTourActivity
 import com.universidad.prograv.proyecto_programacionv.Fragmentos.Adaptadores.TourAdapter
 import com.universidad.prograv.proyecto_programacionv.R
 import okhttp3.Call
@@ -201,7 +202,7 @@ class AdminToursFragment : Fragment() {
             if (tipoTourSeleccionado == "Tour cabalgata"){
                 nuevoTour["cantidadCaballos"] = cantidadVehiculos!!
             } else if (tipoTourSeleccionado == "Tour en cuadraciclo") {
-                nuevoTour["catidadVehiculos"] = cantidadVehiculos!!
+                nuevoTour["cantidadVehiculos"] = cantidadVehiculos!!
              }
 
             db.collection("tours")
@@ -283,6 +284,24 @@ class AdminToursFragment : Fragment() {
                         Toast.makeText(requireContext(), "Tour: ${tour["nombre"]}", Toast.LENGTH_SHORT).show()
                     },
                     onEditar = { tour ->
+                        val intent = Intent(requireContext(), EditarTourActivity::class.java).apply {
+                            putExtra("id", tour["id"] as? String)
+                            putExtra("imagenUrl", tour["imagenUrl"] as? String)
+                            putExtra("nombre", tour["nombre"] as? String)
+                            putExtra("descripcion", tour["descripcion"] as? String)
+                            putExtra("duracion", tour["duracion"] as? String)
+                            putExtra("fecha", tour["fecha"] as? String)
+                            putExtra("tipoTour", tour["tipoTour"] as? String)
+
+                            (tour["precioIndividual"] as? Number)?.toDouble()?.let { putExtra("precioIndividual", it) }
+                            (tour["precioDoble"] as? Number)?.toDouble()?.let { putExtra("precioDoble", it) }
+                            (tour["cantidadCaballos"] as? Number)?.let { putExtra("cantidadCaballos", it.toInt()) }
+                            (tour["cantidadVehiculos"] as? Number)?.let { putExtra("cantidadVehiculos", it.toInt()) }
+
+                            val horarios = tour["horarios"] as? List<*>
+                            putExtra("horarios", ArrayList(horarios?.mapNotNull { it?.toString() }))
+                        }
+                        startActivity(intent)
                         Toast.makeText(requireContext(), "Editar: ${tour["nombre"]}", Toast.LENGTH_SHORT).show()
                     },
                     onEliminar = { tour ->
