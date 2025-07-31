@@ -13,6 +13,9 @@
         android:theme="@style/Theme.Proyecto_ProgramacionV"
         tools:targetApi="31">
         <activity
+            android:name=".Activities.Cliente.VerTourActivity"
+            android:exported="false" />
+        <activity
             android:name=".Activities.Generales.AdminDashboardActivity"
             android:exported="false" />
         <activity
@@ -30,8 +33,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity
-            android:name=".Activities.Administrador.EditarTourActivity"/>
+        <activity android:name=".Activities.Administrador.EditarTourActivity" />
     </application>
 
 </manifest>

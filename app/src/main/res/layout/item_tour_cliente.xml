@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="8dp"
+    app:cardElevation="4dp"
+    app:cardCornerRadius="16dp"
+    android:backgroundTint="@color/white">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:minHeight="100dp"
+        android:padding="12dp">
+
+        <ImageView
+            android:id="@+id/iv_ImagenTour"
+            android:layout_width="120dp"
+            android:layout_height="135dp"
+            android:layout_alignParentStart="true"
+            android:contentDescription="Imagen del tour"
+            android:adjustViewBounds="true"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_toEndOf="@+id/iv_ImagenTour"
+            android:layout_marginStart="12dp"
+            android:layout_marginEnd="8dp"
+            android:layout_alignTop="@+id/iv_ImagenTour">
+
+            <TextView
+                android:id="@+id/tv_NombreTour"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Nombre del tour"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:textColor="#000000"/>
+
+            <TextView
+                android:id="@+id/tv_FechaTour"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="21/08/2025"
+                android:textSize="16sp"
+                android:textColor="#555555"
+                android:layout_marginTop="8dp"/>
+
+            <TextView
+                android:id="@+id/tv_HorasTour"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="*****"
+                android:textSize="14sp"
+                android:textColor="#555555"
+                android:layout_marginTop="8dp"/>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/buttonVerTour"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Ver tour"
+                android:textAllCaps="true"
+                android:layout_marginTop="6dp"
+                android:backgroundTint="@color/Anaranjado"
+                android:textColor="@color/white"
+                android:paddingHorizontal="24dp"
+                android:layout_gravity="end"
+                app:cornerRadius="16dp"/>
+        </LinearLayout>
+    </RelativeLayout>
+</com.google.android.material.card.MaterialCardView>
