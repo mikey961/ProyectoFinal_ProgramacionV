@@ -1,5 +1,6 @@
 package com.universidad.prograv.proyecto_programacionv.Fragmentos.Cliente
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -10,6 +11,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.toObject
+import com.universidad.prograv.proyecto_programacionv.Activities.Cliente.VerTourActivity
 import com.universidad.prograv.proyecto_programacionv.Fragmentos.Adaptadores.ClienteToursAdapter
 import com.universidad.prograv.proyecto_programacionv.Fragmentos.Adaptadores.Tour
 import com.universidad.prograv.proyecto_programacionv.R
@@ -27,7 +29,9 @@ class ClienteToursFragment : Fragment() {
         recyclerView = view.findViewById(R.id.rv_Tours_Cliente)
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
         adaptador = ClienteToursAdapter(requireContext(), tourList) { tour ->
-            Toast.makeText(requireContext(), "Tour: ${tour.nombre}", Toast.LENGTH_SHORT).show()
+            val intent = Intent(requireContext(), VerTourActivity::class.java)
+            intent.putExtra("tour", tour)
+            startActivity(intent)
         }
         recyclerView.adapter = adaptador
         cargarToursCliente()

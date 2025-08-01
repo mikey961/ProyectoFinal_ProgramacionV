@@ -34,7 +34,7 @@ class ClienteToursAdapter(
 
         holder.nombre.text = tour.nombre
         holder.fecha.text = tour.fecha
-        holder.horas.text = tour.horarios.joinToString(" | ")
+        holder.horas.text = tour.horarios?.joinToString(" | ")
 
         Glide.with(context).load(tour.imagenUrl).into(holder.imagen)
 

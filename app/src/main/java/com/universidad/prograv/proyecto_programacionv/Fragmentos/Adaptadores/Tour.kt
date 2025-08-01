@@ -1,15 +1,17 @@
 package com.universidad.prograv.proyecto_programacionv.Fragmentos.Adaptadores
 
+import java.io.Serializable
+
 data class Tour(
-    val id : String = "",
-    val nombre : String = "",
-    val descripcion : String = "",
-    val duracion : String = "",
-    val fecha : String = "",
-    val horarios : List<String> = emptyList(),
-    val cantidadVehiculos : Int = 0,
-    val precioDoble : Double = 0.0,
-    val precioIndividual : Double = 0.0,
-    val imagenUrl : String = "",
-    val tipoTour : String = ""
-)
+    val id : String? = null,
+    val nombre : String? = null,
+    val descripcion : String? = null,
+    val duracion : String? = null,
+    val cantidadVehiculos : Int? = null,
+    val precioDoble : Double? = null,
+    val precioIndividual : Double? = null,
+    val horarios : List<String>? = null,
+    val fecha : String? = null,
+    val imagenUrl : String? = null,
+    val tipoTour : String? = null
+) : Serializable
