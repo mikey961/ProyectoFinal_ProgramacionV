@@ -9,27 +9,6 @@
     tools:context=".Fragmentos.Registro.LoginFragment">
 
     <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/roleLayout"
-        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="Selecciona una opción"
-        android:layout_marginTop="8dp"
-        app:endIconMode="dropdown_menu"
-        app:boxCornerRadiusTopStart="12dp"
-        app:boxCornerRadiusTopEnd="12dp"
-        app:boxCornerRadiusBottomStart="12dp"
-        app:boxCornerRadiusBottomEnd="12dp">
-
-        <com.google.android.material.textfield.MaterialAutoCompleteTextView
-            android:id="@+id/roleInput"
-            android:layout_width="363dp"
-            android:layout_height="50dp"
-            android:paddingStart="12dp"
-            android:inputType="text" />
-    </com.google.android.material.textfield.TextInputLayout>
-
-    <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/emailLayout"
         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
         android:layout_width="match_parent"

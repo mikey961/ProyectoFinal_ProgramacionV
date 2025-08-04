@@ -13,6 +13,12 @@
             android:icon="@drawable/ic_tour"
             android:title="Tours" />
         <item
+            android:id="@+id/nav_gestionarUsuarios"
+            android:icon="@drawable/ic_person_admin"
+            android:title="Gestion usuarios"
+            android:enabled="true"
+            android:visible="false"/>
+        <item
             android:id="@+id/nav_MiPerfil"
             android:icon="@drawable/ic_miperfil"
             android:title="MiPerfil" />

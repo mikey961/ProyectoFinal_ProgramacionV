@@ -10,10 +10,9 @@ import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.toObject
 import com.universidad.prograv.proyecto_programacionv.Activities.Cliente.VerTourActivity
 import com.universidad.prograv.proyecto_programacionv.Fragmentos.Adaptadores.ClienteToursAdapter
-import com.universidad.prograv.proyecto_programacionv.Fragmentos.Adaptadores.Tour
+import com.universidad.prograv.proyecto_programacionv.Modelos.Tour
 import com.universidad.prograv.proyecto_programacionv.R
 
 

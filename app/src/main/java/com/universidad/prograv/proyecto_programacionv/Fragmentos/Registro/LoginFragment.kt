@@ -34,14 +34,9 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
     private lateinit var passwordLayout : TextInputLayout
     private lateinit var emailError : TextView
     private lateinit var passwordError : TextView
-    private lateinit var roleInput : AutoCompleteTextView
-    private val roles = listOf("Cliente", "Administrador")
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.fragment_login, container, false)
-        roleInput = view.findViewById(R.id.roleInput)
-        val adapter = ArrayAdapter(requireContext(), R.layout.item_dropdown, roles)
-        roleInput.setAdapter(adapter)
 
         emailInput = view.findViewById(R.id.emailInput)
         passwordInput = view.findViewById(R.id.passwordInput)
@@ -58,7 +53,6 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
 
             val email = emailInput.text.toString().trim()
             val password = passwordInput.text.toString().trim()
-            val selectRole = roleInput.text.toString()
 
             if (email.isEmpty()) {
                 mostrarErrorEmail("Por favor ingrese su correo electronico")
@@ -67,11 +61,6 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
 
             if (password.isEmpty()) {
                 mostrarErrorPassword("Por favor ingrese su contraseña")
-                return@setOnClickListener
-            }
-
-            if (selectRole.isEmpty()){
-                Toast.makeText(requireContext(), "Seleccione un tipo de usuario", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
 
@@ -93,26 +82,32 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
                             .addOnSuccessListener { document ->
                                 if (document.exists()){
                                     val userRole = document.getString("role")?.trim() ?: ""
-                                    val selectedRole = selectRole.trim()
+                                    val isSuperAdmin = document.getBoolean("superAdmin") ?: false
                                     Log.d("FIREBASE_DEBUG", "Rol en Firestore: $userRole")
 
-                                    if (selectedRole.equals("Administrador", ignoreCase = true) &&
-                                        userRole.equals("Administrador", ignoreCase = true)){
-                                        val intent = Intent(requireContext(), AdminDashboardActivity::class.java)
-                                        startActivity(intent)
-                                        requireActivity().finishAffinity()
-                                        return@addOnSuccessListener
-                                    }
+                                    when(userRole.lowercase()){
+                                        "administrador" -> {
+                                            val intent = Intent(requireContext(), AdminDashboardActivity::class.java)
+                                            startActivity(intent)
+                                            requireActivity().finishAffinity()
 
-                                    //Aqui se verifica si el rol de firestore coincida con 'client'
-                                    if (selectRole == "Cliente" && userRole == "Cliente"){
-                                        val intent = Intent(requireContext(), homeActivity::class.java)
-                                        startActivity(intent)
-                                        requireActivity().finishAffinity()
-                                        return@addOnSuccessListener
+                                            if (isSuperAdmin){
+                                                Toast.makeText(requireContext(), "Bienvenido administrador principal", Toast.LENGTH_SHORT).show()
+                                            } else {
+                                                Toast.makeText(requireContext(), "Bienvenido administrador", Toast.LENGTH_SHORT).show()
+                                            }
+                                        }
+                                        "cliente" -> {
+                                            val intent = Intent(requireContext(), homeActivity::class.java)
+                                            startActivity(intent)
+                                            requireActivity().finishAffinity()
+                                            Toast.makeText(requireContext(), "Bienvenido Cliente", Toast.LENGTH_SHORT).show()
+                                        }
+                                        else -> {
+                                            Toast.makeText(requireContext(), "Rol no autorizado o incorrecto", Toast.LENGTH_SHORT).show()
+                                            auth.signOut()
+                                        }
                                     }
-                                    Toast.makeText(requireContext(), "Rol no autorizado o incorrecto", Toast.LENGTH_SHORT).show()
-                                    auth.signOut()
                                 } else {
                                     Toast.makeText(requireContext(), "Usuario no registrado correctamente", Toast.LENGTH_SHORT).show()
                                 }

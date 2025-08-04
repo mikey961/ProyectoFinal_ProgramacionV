@@ -1,4 +1,4 @@
-package com.universidad.prograv.proyecto_programacionv.Fragmentos.Adaptadores
+package com.universidad.prograv.proyecto_programacionv.Modelos
 
 import java.io.Serializable
 

@@ -210,6 +210,7 @@ class AdminToursFragment : Fragment() {
                 .addOnSuccessListener {
                     Toast.makeText(requireContext(), "¡Tour Guardado!", Toast.LENGTH_SHORT).show()
                     dialog.dismiss()
+                    cargarTours(requireView().findViewById(R.id.recycler_Tours))
                 }
                 .addOnFailureListener {
                     Toast.makeText(requireContext(), "Error al guardar el tour: ${it.message}", Toast.LENGTH_SHORT).show()

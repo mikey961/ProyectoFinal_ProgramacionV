@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginHorizontal="12dp"
+    android:layout_marginVertical="6dp"
+    app:cardCornerRadius="16dp"
+    app:cardElevation="4dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp">
+        
+        <TextView
+            android:id="@+id/tv_NombreApellido_Usuario"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Nombre y apellido"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:textColor="@android:color/black"
+            android:layout_marginBottom="4dp"/>
+
+        <TextView
+            android:id="@+id/tv_Correo_Usuario"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="ejemplo@gmail.com"
+            android:textSize="16sp"
+            android:textColor="@color/black"
+            android:layout_marginBottom="12dp"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_horizontal">
+
+            <TextView
+                android:id="@+id/tv_Asignar"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="12dp"
+                android:text="Asignar"
+                android:textColor="@color/black"
+                android:textSize="14sp" />
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+                app:boxCornerRadiusTopStart="24dp"
+                app:boxCornerRadiusTopEnd="24dp"
+                app:boxCornerRadiusBottomStart="24dp"
+                app:boxCornerRadiusBottomEnd="24dp"
+                app:endIconMode="dropdown_menu"
+                app:boxBackgroundMode="outline">
+
+                <com.google.android.material.textfield.MaterialAutoCompleteTextView
+                    android:id="@+id/actv_AsignarRole"
+                    android:layout_width="match_parent"
+                    android:layout_height="30dp"
+                    android:hint="Seleccionar Rol"
+                    android:textColor="@color/black"
+                    android:textSize="14sp"
+                    android:paddingStart="12dp"
+                    android:paddingEnd="12dp"
+                    android:inputType="none"/>
+            </com.google.android.material.textfield.TextInputLayout>
+        </LinearLayout>
+    </LinearLayout>
+
+</androidx.cardview.widget.CardView>

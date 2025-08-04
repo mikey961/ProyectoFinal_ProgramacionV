@@ -7,7 +7,7 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.bumptech.glide.Glide
-import com.universidad.prograv.proyecto_programacionv.Fragmentos.Adaptadores.Tour
+import com.universidad.prograv.proyecto_programacionv.Modelos.Tour
 import com.universidad.prograv.proyecto_programacionv.R
 
 class VerTourActivity : AppCompatActivity() {

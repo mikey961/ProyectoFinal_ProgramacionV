@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:fitsSystemWindows="true"
+    tools:context=".Fragmentos.Administrador.GestionarUsuarios">
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/til_BuscarUsuario"
+        style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint=""
+        app:startIconDrawable="@drawable/ic_search"
+        app:boxBackgroundMode="outline"
+        app:boxCornerRadiusTopStart="24dp"
+        app:boxCornerRadiusTopEnd="24dp"
+        app:boxCornerRadiusBottomStart="24dp"
+        app:boxCornerRadiusBottomEnd="24dp"
+        app:boxStrokeWidth="1dp"
+        app:boxStrokeWidthFocused="2dp"
+        android:layout_marginHorizontal="12dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp"
+        app:hintEnabled="false">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/tiet_BuscarUsuario"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="text"
+            android:hint="Buscar usuario"
+            android:paddingStart="8dp"
+            android:paddingEnd="8dp"
+            android:paddingTop="12dp"
+            android:paddingBottom="12dp"
+            android:textColor="@android:color/black"
+            android:textSize="16sp"/>
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rv_GestionUsuarios"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"/>
+</LinearLayout>

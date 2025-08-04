@@ -21,7 +21,6 @@ class RegisterFragment : Fragment(R.layout.fragment_register) {
     private val binding get() = _binding!!
     private lateinit var auth : FirebaseAuth
     private var db = FirebaseFirestore.getInstance()
-    private var roles = arrayOf("Cliente", "Administrador")
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         _binding = FragmentRegisterBinding.inflate(inflater, container, false)
@@ -32,16 +31,15 @@ class RegisterFragment : Fragment(R.layout.fragment_register) {
         super.onViewCreated(view, savedInstanceState)
         auth = FirebaseAuth.getInstance()
 
-        setRolesSpinner()
         binding.registerButton.setOnClickListener{
             val nombre = binding.nombreInput.text.toString().trim()
             val apellido = binding.apellidoInput.text.toString().trim()
-            val role = binding.changeInput.text.toString().trim()
+            val role = "Administrador"
             val email = binding.emailInput.text.toString().trim()
             val password = binding.passwordInput.text.toString().trim()
             val confirmPassword = binding.confirmPasswordInput.text.toString().trim()
 
-            if (!validarCampos(nombre, apellido, role, email, password, confirmPassword)){
+            if (!validarCampos(nombre, apellido, email, password, confirmPassword)){
                 return@setOnClickListener
             }
 
@@ -76,11 +74,6 @@ class RegisterFragment : Fragment(R.layout.fragment_register) {
         }
     }
 
-    private fun setRolesSpinner(){
-        val adaptador = ArrayAdapter(requireContext(), android.R.layout.simple_dropdown_item_1line, roles)
-        (binding.changeInput as MaterialAutoCompleteTextView).setAdapter(adaptador)
-    }
-
     private fun crearUsuarioYGuardarDatos(nombre: String, apellido: String, role: String, email: String, password : String){
         auth.createUserWithEmailAndPassword(email, password)
             .addOnCompleteListener{ createTask ->
@@ -103,6 +96,7 @@ class RegisterFragment : Fragment(R.layout.fragment_register) {
                 "apellido" to apellido,
                 "role" to role,
                 "email" to email,
+                "superAdmin" to false,
                 "createdAt" to System.currentTimeMillis()
             )
 
@@ -116,7 +110,7 @@ class RegisterFragment : Fragment(R.layout.fragment_register) {
         binding.registerButton.isEnabled = true
     }
 
-    private fun validarCampos(nombre : String, apellido : String, role : String, email : String, password : String, confirmPassword : String) : Boolean{
+    private fun validarCampos(nombre : String, apellido : String, email : String, password : String, confirmPassword : String) : Boolean{
         var esValido = true
 
         //Validar campo nombre
@@ -135,12 +129,6 @@ class RegisterFragment : Fragment(R.layout.fragment_register) {
             esValido = false
         } else {
             binding.apellidoError.visibility = View.GONE
-        }
-
-        //Validar los roles
-        if (TextUtils.isEmpty(role) || !roles.contains(role)){
-            Toast.makeText(requireContext(), "Seleccione un tipo de usuario valido!", Toast.LENGTH_SHORT).show()
-            esValido = false
         }
 
         //Validar campo email
@@ -187,14 +175,12 @@ class RegisterFragment : Fragment(R.layout.fragment_register) {
     private fun limpiarCampos(){
         binding.nombreInput.text?.clear()
         binding.apellidoInput.text?.clear()
-        binding.changeInput.setText("Tipo de usuario", false)
         binding.emailInput.text?.clear()
         binding.passwordInput.text?.clear()
         binding.confirmPasswordInput.text?.clear()
 
         binding.nameError.visibility = View.GONE
         binding.apellidoError.visibility = View.GONE
-        binding.changeLayout.error = null
         binding.emailError.visibility = View.GONE
         binding.passwordError.visibility = View.GONE
         binding.confirmPasswordError.visibility = View.GONE
