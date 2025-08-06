@@ -3,12 +3,15 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="16dp">
+    android:padding="16dp"
+    android:fitsSystemWindows="true">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
+        android:layout_marginStart="12dp"
+        android:layout_marginEnd="12dp"
         android:gravity="center_horizontal">
 
         <ImageView
@@ -28,45 +31,176 @@
             android:layout_marginTop="12dp"
             android:textColor="#000000" />
 
+        <LinearLayout
+            android:id="@+id/layoutRaiting"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="8dp">
+
+            <ImageView
+                android:id="@+id/estrella1"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:src="@drawable/star_empty"
+                app:tint="#FFD700"
+                android:padding="2dp"/>
+
+            <ImageView
+                android:id="@+id/estrella2"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:src="@drawable/star_empty"
+                app:tint="#FFD700"
+                android:padding="2dp"/>
+
+            <ImageView
+                android:id="@+id/estrella3"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:src="@drawable/star_empty"
+                app:tint="#FFD700"
+                android:padding="2dp"/>
+
+            <ImageView
+                android:id="@+id/estrella4"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:src="@drawable/star_empty"
+                app:tint="#FFD700"
+                android:padding="2dp"/>
+
+            <ImageView
+                android:id="@+id/estrella5"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:src="@drawable/star_empty"
+                app:tint="#FFD700"
+                android:padding="2dp"/>
+
+            <TextView
+                android:id="@+id/tv_PuntajeEstrella"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="0.0"
+                android:textSize="18sp"
+                android:textColor="#000000"
+                android:layout_marginStart="8dp"
+                android:layout_gravity="center_vertical"/>
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Descripción"
+            android:textStyle="bold"
+            android:textSize="16sp"
+            android:textColor="@color/black"
+            android:layout_marginTop="8dp"/>
+        
         <TextView
             android:id="@+id/tv_DescripcionTour_VerTour"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Descripción"
-            android:layout_marginTop="8dp"
-            android:textSize="16sp" />
+            android:text="Descripcion del tour"
+            android:textSize="15sp"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Duración"
+            android:textStyle="bold"
+            android:textSize="16sp"
+            android:textColor="@color/black"
+            android:layout_marginTop="12dp"/>
 
         <TextView
             android:id="@+id/tv_DuracionTour_VerTour"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Duración: X horas"
-            android:layout_marginTop="8dp"
-            android:textSize="16sp" />
+            android:text="X horas"
+            android:textSize="15sp"/>
+
+        <TextView
+            android:id="@+id/tv_LabelCantidadVehiculos_VerTour"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Cantidad de vehiculos"
+            android:textStyle="bold"
+            android:textSize="16sp"
+            android:textColor="@color/black"
+            android:layout_marginTop="12dp"/>
 
         <TextView
             android:id="@+id/tv_CantidadVehiculos_VerTour"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Cantidad de vehículos: X"
-            android:layout_marginTop="8dp"
-            android:textSize="16sp" />
+            android:text="X"
+            android:textSize="15sp" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Precio individual"
+            android:textStyle="bold"
+            android:textSize="16sp"
+            android:textColor="@color/black"
+            android:layout_marginTop="12dp"/>
+
+        <TextView
+            android:id="@+id/tv_PrecionIndividual_VerTour"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="$XXXX"
+            android:textSize="15sp" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Precio Doble"
+            android:textStyle="bold"
+            android:textSize="16sp"
+            android:textColor="@color/black"
+            android:layout_marginTop="12dp"/>
 
         <TextView
             android:id="@+id/tv_PrecioDoble_VerTour"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Precio Adulto: ₡XXXX"
-            android:layout_marginTop="8dp"
-            android:textSize="16sp" />
+            android:text="$XXXX"
+            android:textSize="15sp" />
 
         <TextView
-            android:id="@+id/tv_PrecioIndividual_VerTour"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Precio Menor: ₡XXXX"
-            android:layout_marginTop="8dp"
-            android:textSize="16sp" />
+            android:text="Fecha"
+            android:textStyle="bold"
+            android:textSize="16sp"
+            android:textColor="@color/black"
+            android:layout_marginTop="12dp"/>
+
+        <TextView
+            android:id="@+id/tv_FechasTourDisponible_VerTour"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="XX/XX/XXXX"
+            android:textSize="15sp" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Horarios Disponibles"
+            android:textStyle="bold"
+            android:textSize="16sp"
+            android:textColor="@color/black"
+            android:layout_marginTop="12dp"/>
+
+        <TextView
+            android:id="@+id/tv_HorariosDisponibles_VerTour"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="8:00 a.m, 10:00 a.m"
+            android:textSize="15sp" />
 
         <Button
             android:id="@+id/buttonReservar_VerTour"
@@ -77,5 +211,15 @@
             android:backgroundTint="@color/Anaranjado"
             android:textColor="@android:color/white"
             android:textAllCaps="false"/>
+
+        <Button
+            android:id="@+id/buttonVolverTour"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Volver"
+            android:layout_marginTop="12dp"
+            android:backgroundTint="@color/black"
+            android:textColor="@android:color/white"
+            android:textAllCaps="false" />
     </LinearLayout>
 </ScrollView>

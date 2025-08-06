@@ -25,6 +25,8 @@ import com.google.android.material.datepicker.MaterialDatePicker
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
+import com.google.firebase.Timestamp
+import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.universidad.prograv.proyecto_programacionv.Activities.Administrador.EditarTourActivity
 import com.universidad.prograv.proyecto_programacionv.Fragmentos.Adaptadores.TourAdapter
@@ -196,14 +198,15 @@ class AdminToursFragment : Fragment() {
                 "fecha" to fecha,
                 "horarios" to horarios,
                 "imagenUrl" to urlImagen,
-                "tipoTour" to tipoTourSeleccionado
+                "tipoTour" to tipoTourSeleccionado,
+                "creadoEn" to Timestamp.now()
             )
 
             if (tipoTourSeleccionado == "Tour cabalgata"){
-                nuevoTour["cantidadCaballos"] = cantidadVehiculos!!
+                nuevoTour["cantidadVehiculos"] = cantidadVehiculos!!
             } else if (tipoTourSeleccionado == "Tour en cuadraciclo") {
                 nuevoTour["cantidadVehiculos"] = cantidadVehiculos!!
-             }
+            }
 
             db.collection("tours")
                 .add(nuevoTour)
@@ -235,7 +238,13 @@ class AdminToursFragment : Fragment() {
             .post(requestBody)
             .build()
 
-        OkHttpClient().newCall(request).enqueue(object : Callback {
+        val cliente = OkHttpClient.Builder()
+            .connectTimeout(20, java.util.concurrent.TimeUnit.SECONDS)
+            .readTimeout(30, java.util.concurrent.TimeUnit.SECONDS)
+            .writeTimeout(30, java.util.concurrent.TimeUnit.SECONDS)
+            .build()
+
+        cliente.newCall(request).enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
                 requireActivity().runOnUiThread {
                     Toast.makeText(context, "Error de red: ${e.message}", Toast.LENGTH_SHORT).show()

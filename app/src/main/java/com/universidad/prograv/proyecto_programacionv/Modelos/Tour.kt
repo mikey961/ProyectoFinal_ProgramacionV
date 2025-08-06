@@ -1,6 +1,7 @@
 package com.universidad.prograv.proyecto_programacionv.Modelos
 
 import java.io.Serializable
+import java.util.Date
 
 data class Tour(
     val id : String? = null,
@@ -13,5 +14,6 @@ data class Tour(
     val horarios : List<String>? = null,
     val fecha : String? = null,
     val imagenUrl : String? = null,
-    val tipoTour : String? = null
+    val tipoTour : String? = null,
+    val creadoEn : Date? = null
 ) : Serializable
