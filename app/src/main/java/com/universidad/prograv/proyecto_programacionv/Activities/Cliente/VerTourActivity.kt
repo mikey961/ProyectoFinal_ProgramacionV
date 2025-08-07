@@ -1,5 +1,6 @@
 package com.universidad.prograv.proyecto_programacionv.Activities.Cliente
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.View
@@ -101,7 +102,9 @@ class VerTourActivity : AppCompatActivity() {
         }
 
         btnReservar.setOnClickListener {
-            Toast.makeText(this, "Ir a reservar tour...", Toast.LENGTH_SHORT).show()
+            val intent = Intent(this, DatosCliente::class.java)
+            intent.putExtra("tour", tour)
+            startActivity(intent)
         }
 
         btnVolver.setOnClickListener {
