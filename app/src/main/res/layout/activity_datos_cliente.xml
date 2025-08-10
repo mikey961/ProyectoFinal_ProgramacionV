@@ -139,38 +139,64 @@
                 android:inputType="none"/>
         </com.google.android.material.textfield.TextInputLayout>
 
-        <LinearLayout
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/til_Hora_Reserva"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="end"
-            android:layout_marginTop="12dp">
+            android:hint="Seleccione una hora"
+            android:layout_marginTop="12dp"
+            app:endIconMode="dropdown_menu"
+            app:boxCornerRadiusTopStart="24dp"
+            app:boxCornerRadiusTopEnd="24dp"
+            app:boxCornerRadiusBottomStart="24dp"
+            app:boxCornerRadiusBottomEnd="24dp">
 
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/buttonResrvarTour"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="Reservar"
-                android:textAllCaps="false"
-                android:textColor="@color/white"
-                android:textStyle="bold"
-                android:textSize="16sp"
-                android:backgroundTint="@color/Anaranjado"
-                android:layout_marginEnd="8dp"/>
+            <com.google.android.material.textfield.MaterialAutoCompleteTextView
+                android:id="@+id/actv_Hora_Reserva"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:paddingStart="12dp"
+                android:paddingEnd="12dp"/>
+        </com.google.android.material.textfield.TextInputLayout>
 
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/buttonEnviarACarritoTour"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="Agregar al carrito"
-                android:textAllCaps="false"
-                android:textColor="@color/white"
-                android:textStyle="bold"
-                android:textSize="16sp"
-                android:backgroundTint="@color/verde_claro"/>
-        </LinearLayout>
+        <TextView
+            android:id="@+id/tv_SubtotalIndividual"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Individual: $0.00"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:layout_marginTop="16dp"/>
+
+        <TextView
+            android:id="@+id/tv_SubtotalDoble"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Doble: $0.00"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:layout_marginTop="6dp"/>
+
+        <TextView
+            android:id="@+id/tv_TotalReserva"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Total: $0.00"
+            android:textSize="28sp"
+            android:textStyle="bold"
+            android:layout_marginTop="10dp"/>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/buttonResrvarTour"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Reservar"
+            android:textAllCaps="false"
+            android:textColor="@color/white"
+            android:textStyle="bold"
+            android:textSize="16sp"
+            android:backgroundTint="@color/Anaranjado"
+            android:layout_marginEnd="8dp"/>
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/buttonVolver_Reserva"
