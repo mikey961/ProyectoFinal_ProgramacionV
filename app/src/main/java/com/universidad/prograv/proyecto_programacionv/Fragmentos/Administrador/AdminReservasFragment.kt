@@ -5,56 +5,213 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ArrayAdapter
+import android.widget.AutoCompleteTextView
+import android.widget.Toast
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.ListenerRegistration
+import com.universidad.prograv.proyecto_programacionv.Fragmentos.Adaptadores.ReservasAdminAdapter
+import com.universidad.prograv.proyecto_programacionv.Modelos.Reserva
 import com.universidad.prograv.proyecto_programacionv.R
 
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
-
-/**
- * A simple [Fragment] subclass.
- * Use the [AdminReservasFragment.newInstance] factory method to
- * create an instance of this fragment.
- */
 class AdminReservasFragment : Fragment() {
-    // TODO: Rename and change types of parameters
-    private var param1: String? = null
-    private var param2: String? = null
+    private lateinit var rv_ReservasAdmin: RecyclerView
+    private lateinit var actvFiltro: AutoCompleteTextView
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        arguments?.let {
-            param1 = it.getString(ARG_PARAM1)
-            param2 = it.getString(ARG_PARAM2)
+    private var db = FirebaseFirestore.getInstance()
+
+    private val reservasFull = mutableListOf<Reserva>()
+    private val reservasVisibles = mutableListOf<Reserva>()
+    private lateinit var adaptador: ReservasAdminAdapter
+
+    private var filtroCorreoSeleccionado: String? = null
+    private var listener: ListenerRegistration? = null
+
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        val view = inflater.inflate(R.layout.fragment_admin_reservas, container, false)
+
+        rv_ReservasAdmin = view.findViewById(R.id.rv_AdminReservas)
+        actvFiltro = view.findViewById(R.id.actv_FiltroClientes)
+
+        rv_ReservasAdmin.layoutManager = LinearLayoutManager(requireContext())
+        adaptador = ReservasAdminAdapter(
+            reservasVisibles,
+            onCancelarAdmin = { r -> onCancelarComoAdmin(r) },
+            onRenovarAdmin = { r -> onRenovarComoAdmin(r) }
+        )
+        rv_ReservasAdmin.adapter = adaptador
+
+        configurarFiltroUI()
+        escucharReservas()
+
+        return view
+    }
+
+    protected fun escucharReservas() {
+        listener?.remove()
+        listener = db.collection("reservas")
+            .addSnapshotListener { snap, err ->
+                if (err != null) {
+                    Toast.makeText(requireContext(), "Error: ${err.message}", Toast.LENGTH_SHORT)
+                        .show()
+                    return@addSnapshotListener
+                }
+
+                reservasFull.clear()
+                snap?.documents?.forEach { doc ->
+                    doc.toObject(Reserva::class.java)
+                        ?.let { reservasFull.add(it.copy(id = doc.id)) }
+                }
+
+                poblarOpcionesFiltro()
+                aplicarFiltro()
+            }
+    }
+
+    private fun poblarOpcionesFiltro() {
+        val clientesUnicos: List<ClienteEtiqueta> = reservasFull
+            .filter { !(it.correo.isNullOrBlank() && (it.nombre.isNullOrBlank() && it.apellido.isNullOrBlank())) }
+            .groupBy { (it.correo ?: "${it.nombre ?: ""} ${it.apellido ?: ""}".trim()).lowercase() }
+            .map { (_, lista) ->
+                val r = lista.first()
+                val correo = r.correo?.trim().orEmpty()
+                val etiquetaNombre =
+                    "${(r.nombre ?: "").trim()} ${(r.apellido ?: "").trim()}".trim()
+                ClienteEtiqueta(
+                    correo = if (correo.isNotEmpty()) correo else etiquetaNombre,
+                    etiqueta = if (etiquetaNombre.isNotEmpty()) etiquetaNombre else correo
+                )
+            }
+            .sortedBy { it.etiqueta.lowercase() }
+
+        val opcionesUi = mutableListOf("Todos")
+        opcionesUi += clientesUnicos.map { it.etiqueta }
+
+        actvFiltro.setAdapter(
+            ArrayAdapter(requireContext(), android.R.layout.simple_dropdown_item_1line, opcionesUi)
+        )
+
+        actvFiltro.setTag(R.id.actv_FiltroClientes, clientesUnicos)
+
+
+        if (filtroCorreoSeleccionado == null) {
+            actvFiltro.setText("Todos", false)
+        } else {
+            val etiquetaSeleccionada = clientesUnicos.firstOrNull {
+                it.correo.equals(filtroCorreoSeleccionado, ignoreCase = true)
+            }?.etiqueta ?: "Todos"
+            actvFiltro.setText(etiquetaSeleccionada, false)
         }
     }
 
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_admin_reservas, container, false)
+    private fun configurarFiltroUI() {
+        actvFiltro.setOnItemClickListener { _, _, _, _ ->
+            val texto = actvFiltro.text?.toString()?.trim().orEmpty()
+            if (texto.equals("Todos", ignoreCase = true)) {
+                filtroCorreoSeleccionado = null
+            } else {
+                @Suppress("UNCHECKED_CAST")
+                val clientesUnicos =
+                    actvFiltro.getTag(R.id.actv_FiltroClientes) as? List<ClienteEtiqueta>
+                val match = clientesUnicos?.firstOrNull { it.etiqueta.equals(texto, true) }
+                filtroCorreoSeleccionado = match?.correo
+            }
+            aplicarFiltro()
+        }
     }
 
-    companion object {
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
-         * @return A new instance of fragment AdminReservasFragment.
-         */
-        // TODO: Rename and change types and number of parameters
-        @JvmStatic
-        fun newInstance(param1: String, param2: String) =
-            AdminReservasFragment().apply {
-                arguments = Bundle().apply {
-                    putString(ARG_PARAM1, param1)
-                    putString(ARG_PARAM2, param2)
+    private fun aplicarFiltro() {
+        reservasVisibles.clear()
+        reservasVisibles += if (filtroCorreoSeleccionado.isNullOrEmpty()) {
+            reservasFull
+        } else {
+            reservasFull.filter { r ->
+                val clave = r.correo?.trim().ifNullOrBlank {
+                    "${(r.nombre ?: "").trim()} ${(r.apellido ?: "").trim()}".trim()
                 }
+                clave.equals(filtroCorreoSeleccionado, ignoreCase = true)
             }
+        }
+        adaptador.notifyDataSetChanged()
+    }
+
+    private fun onCancelarComoAdmin(reserva: Reserva) {
+        if (reserva.cancelRequested != true) {
+            Toast.makeText(requireContext(), "El cliente no ha solicitado cancelar esta reserva.", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle("Confirmar cancelación")
+            .setMessage("¿Desea cancelar esta reserva?")
+            .setPositiveButton("Cancelar reserva") { _, _ ->
+                val id = reserva.id ?: return@setPositiveButton
+                db.collection("reservas").document(id)
+                    .update(
+                        mapOf(
+                            "estado" to "cancelada",
+                            "cancelRequested" to false
+                        )
+                    )
+                    .addOnSuccessListener {
+                        Toast.makeText(requireContext(), "Reserva cancelada.", Toast.LENGTH_SHORT).show()
+                    }
+                    .addOnFailureListener {
+                        Toast.makeText(requireContext(), "Error: ${it.message}", Toast.LENGTH_SHORT).show()
+                    }
+            }
+            .setNegativeButton("Atrás", null)
+            .show()
+    }
+
+    private fun onRenovarComoAdmin(reserva: Reserva) {
+        // Sólo si el cliente lo solicitó
+        if (reserva.renewRequested != true) {
+            Toast.makeText(requireContext(), "El cliente no ha solicitado renovar esta reserva.", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle("Confirmar renovación")
+            .setMessage("¿Desea reactivar esta reserva?")
+            .setPositiveButton("Renovar") { _, _ ->
+                val id = reserva.id ?: return@setPositiveButton
+                db.collection("reservas")
+                    .document(id)
+                    .update(
+                        mapOf(
+                            "estado" to "activa",
+                            "renewRequested" to false,
+                            "cancelRequested" to false
+                        )
+                    )
+                    .addOnSuccessListener {
+                        Toast.makeText(requireContext(), "Reserva renovada.", Toast.LENGTH_SHORT).show()
+                    }
+                    .addOnFailureListener { e ->
+                        Toast.makeText(requireContext(), "Error: ${e.message}", Toast.LENGTH_SHORT).show()
+                    }
+            }
+            .setNegativeButton("Atrás", null)
+            .show()
+    }
+
+    private inline fun String?.ifNullOrBlank(fallback: () -> String): String {
+        return if (this.isNullOrBlank()) fallback() else this
+    }
+
+    private data class ClienteEtiqueta(val correo: String, val etiqueta: String)
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        listener?.remove()
+        listener = null
     }
 }

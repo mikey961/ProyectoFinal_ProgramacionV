@@ -9,7 +9,9 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ListenerRegistration
 import com.universidad.prograv.proyecto_programacionv.Fragmentos.Adaptadores.MisReservasAdapter
@@ -38,9 +40,12 @@ class ClienteMisReservasFragment : Fragment() {
         tv_Empty = view.findViewById(R.id.tv_EmptyMisReservas)
 
         rv_Reservas.layoutManager = LinearLayoutManager(requireContext())
-        adaptador = MisReservasAdapter(reservas, toursById) {
-            Toast.makeText(requireContext(), "Solicitud de cancelacion de reserva enviada", Toast.LENGTH_SHORT).show()
-        }
+        adaptador = MisReservasAdapter(
+            reservas,
+            toursById,
+            onCancelarClick = { r -> onCancelarClickCliente(r) },
+            onRenovarClick = { r -> onRenovarClickCliente(r) }
+        )
         rv_Reservas.adapter = adaptador
 
         escucharTours()
@@ -91,6 +96,65 @@ class ClienteMisReservasFragment : Fragment() {
             tv_Empty.visibility = if (reservas.isEmpty()) View.VISIBLE else View.GONE
             rv_Reservas.visibility = if (reservas.isEmpty()) View.GONE else View.VISIBLE
         }
+    }
+
+    private fun onCancelarClickCliente(reserva : Reserva) {
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle("Cancelar reserva")
+            .setMessage("¿Desea solicitar la cancelacion de esta reserva?")
+            .setPositiveButton("Solicitar"){ _, _ ->
+                val id = reserva.id ?: return@setPositiveButton
+                val correo = reserva.correo ?: FirebaseAuth.getInstance().currentUser?.email.orEmpty()
+
+                FirebaseFirestore.getInstance()
+                    .collection("reservas")
+                    .document(id)
+                    .update(
+                        mapOf(
+                            "estado" to "cancelacion_pendiente",
+                            "cancelRequested" to true,
+                            "cancelRequestedBy" to (correo ?: ""),
+                            "cancelRequestedAt" to FieldValue.serverTimestamp()
+                        )
+                    )
+                    .addOnSuccessListener{
+                        Toast.makeText(requireContext(), "Solicitud enviada.", Toast.LENGTH_SHORT).show()
+                    }
+                    .addOnFailureListener {
+                        Toast.makeText(requireContext(), "Error al solicitar cancelacion de reserva.", Toast.LENGTH_SHORT).show()
+                    }
+            }
+            .setNegativeButton("Cancelar", null)
+            .show()
+    }
+
+    private fun onRenovarClickCliente(reserva: Reserva) {
+        if (!reserva.estado.equals("cancelada", true)) return
+
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle("Renovar reserva")
+            .setMessage("¿Desea solicitar la renovación de esta reserva?")
+            .setPositiveButton("Solicitar") { _, _ ->
+                val id = reserva.id ?: return@setPositiveButton
+                FirebaseFirestore.getInstance()
+                    .collection("reservas")
+                    .document(id)
+                    .update(
+                        mapOf(
+                            "renewRequested" to true,
+                            "cancelRequested" to false,
+                            "estado" to "renovacion_pendiente"
+                        )
+                    )
+                    .addOnSuccessListener {
+                        Toast.makeText(requireContext(), "Solicitud de renovación enviada.", Toast.LENGTH_SHORT).show()
+                    }
+                    .addOnFailureListener { e ->
+                        Toast.makeText(requireContext(), "Error: ${e.message}", Toast.LENGTH_SHORT).show()
+                    }
+            }
+            .setNegativeButton("Cancelar", null)
+            .show()
     }
 
     override fun onDestroy() {

@@ -10,49 +10,60 @@ import com.universidad.prograv.proyecto_programacionv.Modelos.Tour
 import com.universidad.prograv.proyecto_programacionv.R
 
 class MisReservasAdapter(
-    private val listaReservas : MutableList<Reserva>,
-    toursMap : Map<String, Tour>,
-    private val onCancelarClick : (Reserva) -> Unit
-) : RecyclerView.Adapter<MisReservasAdapter.ReservaViewHolder>(){
+    private val listaReservas: MutableList<Reserva>,
+    private var toursById: Map<String, Tour>,
+    private val onCancelarClick: (Reserva) -> Unit,
+    private val onRenovarClick: (Reserva) -> Unit
+) : RecyclerView.Adapter<MisReservasAdapter.ReservaViewHolder>() {
 
-    var toursById: Map<String, Tour> = toursMap
-        private set
-
-    inner class ReservaViewHolder(itemView : View) : RecyclerView.ViewHolder(itemView){
-        val vtNombreTour : TextView = itemView.findViewById(R.id.tv_NombreTourReserva)
-        val vtNombreUsuario : TextView = itemView.findViewById(R.id.tv_NombreUsuarioReserva)
-        val vtCorreoUsuario : TextView = itemView.findViewById(R.id.tv_CorreoUsuarioReserva)
-        val vtFechaHoraTour : TextView = itemView.findViewById(R.id.tv_FechaHoraTourReserva)
-        val btnCancelar : TextView = itemView.findViewById(R.id.buttonCancelarReserva)
+    inner class ReservaViewHolder(v: View) : RecyclerView.ViewHolder(v) {
+        val vtNombreTour: TextView = v.findViewById(R.id.tv_NombreTourReserva)
+        val vtNombreUsuario: TextView = v.findViewById(R.id.tv_NombreUsuarioReserva)
+        val vtCorreoUsuario: TextView = v.findViewById(R.id.tv_CorreoUsuarioReserva)
+        val vtFechaHoraTour: TextView = v.findViewById(R.id.tv_FechaHoraTourReserva)
+        val tvSolicitud: TextView = v.findViewById(R.id.tv_SolicitudCliente)
+        val btnAccion: com.google.android.material.button.MaterialButton =
+            v.findViewById(R.id.buttonCancelarReserva)
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ReservaViewHolder {
-        val view = LayoutInflater.from(parent.context).inflate(R.layout.item_reserva, parent, false)
-        return ReservaViewHolder(view)
-    }
+    override fun onCreateViewHolder(p: ViewGroup, vt: Int) =
+        ReservaViewHolder(LayoutInflater.from(p.context).inflate(R.layout.item_reserva, p, false))
 
-    override fun onBindViewHolder(holder: ReservaViewHolder, position: Int) {
-        val reserva = listaReservas[position]
+    override fun onBindViewHolder(h: ReservaViewHolder, pos: Int) {
+        val r = listaReservas[pos]
 
-        holder.vtNombreTour.text = reserva.nombreTour
-        holder.vtNombreUsuario.text = "${reserva.nombre} ${reserva.apellido}"
-        holder.vtCorreoUsuario.text = reserva.correo
+        h.vtNombreTour.text = r.nombreTour
+        h.vtNombreUsuario.text = "${r.nombre} ${r.apellido}".trim()
+        h.vtCorreoUsuario.text = r.correo
 
-        val tour = reserva.idTour?.let { toursById[it] }
+        val t = r.idTour?.let { toursById[it] }
+        h.vtFechaHoraTour.text = "${t?.fecha.orEmpty()} - ${r.horaTour.orEmpty()}"
 
-        val fecha = reserva.fechaTour?.takeIf { it.isNotBlank() } ?: tour?.fecha.orEmpty()
-        val hora = reserva.horaTour?.takeIf { it.isNotBlank() } ?: tour?.horarios?.firstOrNull().orEmpty()
-        holder.vtFechaHoraTour.text = "$fecha - $hora"
+        h.tvSolicitud.visibility = View.GONE
 
-        holder.btnCancelar.setOnClickListener {
-            onCancelarClick(reserva)
+        val ctx = h.itemView.context
+        if (r.estado.equals("cancelada", true)) {
+            h.btnAccion.text = "Renovar reserva"
+            h.btnAccion.isEnabled = true
+            h.btnAccion.alpha = 1f
+            h.btnAccion.setBackgroundColor(
+                androidx.core.content.ContextCompat.getColor(ctx, android.R.color.holo_green_dark)
+            )
+            h.btnAccion.setOnClickListener { onRenovarClick(r) }
+        } else {
+            h.btnAccion.text = "Cancelar reserva"
+            h.btnAccion.isEnabled = true
+            h.btnAccion.alpha = 1f
+            h.btnAccion.setBackgroundColor(
+                androidx.core.content.ContextCompat.getColor(ctx, android.R.color.holo_red_dark)
+            )
+            h.btnAccion.setOnClickListener { onCancelarClick(r) }
         }
     }
 
-    override fun getItemCount(): Int = listaReservas.size
+    override fun getItemCount() = listaReservas.size
 
     fun updateTours(newMap: Map<String, Tour>) {
-        toursById = newMap
-        notifyDataSetChanged()
+        toursById = newMap; notifyDataSetChanged()
     }
 }

@@ -50,6 +50,15 @@
             android:layout_marginTop="4dp"
             android:textColor="@android:color/holo_blue_dark"/>
 
+        <TextView
+            android:id="@+id/tv_SolicitudCliente"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="#D32F2F"
+            android:textSize="14sp"
+            android:visibility="gone"
+            android:layout_marginTop="4dp"/>
+
         <com.google.android.material.button.MaterialButton
             android:id="@+id/buttonCancelarReserva"
             android:layout_width="match_parent"
