@@ -1,6 +1,7 @@
 package com.universidad.prograv.proyecto_programacionv.Activities.Cliente
 
 import android.content.Intent
+import android.content.res.ColorStateList
 import android.os.Bundle
 import android.util.Log
 import android.view.View
@@ -9,9 +10,16 @@ import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
+import androidx.core.widget.ImageViewCompat
 import com.bumptech.glide.Glide
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FieldValue
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.SetOptions
 import com.universidad.prograv.proyecto_programacionv.Modelos.Tour
 import com.universidad.prograv.proyecto_programacionv.R
+import java.lang.reflect.Field
 
 class VerTourActivity : AppCompatActivity() {
     private lateinit var imagen : ImageView
@@ -29,8 +37,19 @@ class VerTourActivity : AppCompatActivity() {
     private lateinit var labelCantidadVehiculos : TextView
     private lateinit var estrellas : List<ImageView>
 
+    private lateinit var ivFavorite : ImageView
+    private var isFavorite = false
+
+    private val auth = FirebaseAuth.getInstance()
+    private val db = FirebaseFirestore.getInstance()
+
     private var puntaje = 0.0f
     private var paso = 0.5f
+
+    private var tourId : String = ""
+    private var nombreTour : String = ""
+    private var imagenUrl : String = ""
+    private var precioInd : Double? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -58,13 +77,19 @@ class VerTourActivity : AppCompatActivity() {
             findViewById(R.id.estrella5)
         )
 
-        val tour = intent.getSerializableExtra("tour") as? Tour
+        ivFavorite = findViewById(R.id.iv_Favorite)
 
+        val tour = intent.getSerializableExtra("tour") as? Tour
         if (tour != null){
             Glide.with(this).load(tour.imagenUrl).into(imagen)
             nombre.text = tour.nombre
             descripcion.text = tour.descripcion
             duracion.text = tour.duracion
+
+            tourId = tour.id ?: ""
+            nombreTour = tour.nombre ?: ""
+            imagenUrl = tour.imagenUrl ?: ""
+            precioInd = tour.precioIndividual
 
             if (tour.tipoTour?.equals("Tour cabalgata", ignoreCase = true) == true) {
                 labelCantidadVehiculos.text = "Cantidad de caballos"
@@ -83,6 +108,15 @@ class VerTourActivity : AppCompatActivity() {
             fecha.text = date
 
             horarios.text = tour.horarios?.joinToString(", ") ?: "Sin horarios"
+
+            btnReservar.setOnClickListener {
+                val intent = Intent(this, DatosCliente::class.java)
+                intent.putExtra("tour", tour)
+                startActivity(intent)
+            }
+
+            cargarEstadoFavoritos()
+            cargarMiRaiting()
         } else {
             Toast.makeText(this, "No se pudieron cargar los datos del tour", Toast.LENGTH_SHORT).show()
             finish()
@@ -98,18 +132,13 @@ class VerTourActivity : AppCompatActivity() {
                 }
                 if (puntaje > 5f) puntaje = 0.5f
                 actualizarEstrellas(puntaje)
+                guardarRating(puntaje)
             }
         }
 
-        btnReservar.setOnClickListener {
-            val intent = Intent(this, DatosCliente::class.java)
-            intent.putExtra("tour", tour)
-            startActivity(intent)
-        }
+        ivFavorite.setOnClickListener { toggleFavorito() }
 
-        btnVolver.setOnClickListener {
-            finish()
-        }
+        btnVolver.setOnClickListener { finish() }
     }
 
     private fun actualizarEstrellas(puntaje : Float){
@@ -118,11 +147,119 @@ class VerTourActivity : AppCompatActivity() {
             val posicion = i + 1
 
             when {
-                puntaje >= posicion-> estrella.setImageResource(R.drawable.star)
+                puntaje >= posicion -> estrella.setImageResource(R.drawable.star)
                 puntaje >= posicion - 0.5 -> estrella.setImageResource(R.drawable.star_half)
                 else -> estrella.setImageResource(R.drawable.star_empty)
             }
         }
         puntajeEstrella.text = String.format("%.1f", puntaje)
     }
+
+    private fun cargarEstadoFavoritos(){
+        val uid = uidOrNull() ?: return
+        if (tourId.isEmpty()) return
+
+        db.collection("favorites")
+            .document(uid)
+            .collection("tours")
+            .document(tourId)
+            .get()
+            .addOnSuccessListener { doc ->
+                isFavorite = doc.exists()
+                applyFavoriteTint(isFavorite)
+            }
+    }
+
+    private fun applyFavoriteTint(favorito : Boolean){
+        ivFavorite.setImageResource(R.drawable.ic_favoritos)
+        val colorRes = if (favorito) R.color.Rojo else R.color.grisFavorito
+        ImageViewCompat.setImageTintList(
+            ivFavorite,
+            ColorStateList.valueOf(ContextCompat.getColor(this, colorRes))
+        )
+        ivFavorite.contentDescription = if (favorito) "Quitar de favoritos" else "Agregar a favoritos"
+    }
+
+    private fun toggleFavorito(){
+        val uid  = uidOrNull() ?: run {
+            Toast.makeText(this, "Debes iniciar sesion", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        if (tourId.isEmpty()){
+            Toast.makeText(this, "ID del tour invalido", Toast.LENGTH_SHORT).show()
+        }
+
+        val ref = db.collection("favorites")
+            .document(uid)
+            .collection("tours")
+            .document(tourId)
+
+        if (isFavorite){
+            ref.delete()
+                .addOnSuccessListener{
+                    isFavorite = false
+                    applyFavoriteTint(false)
+                    Toast.makeText(this, "Quitado de favoritos", Toast.LENGTH_SHORT).show()
+                }
+                .addOnFailureListener { e ->
+                    Toast.makeText(this, "Error: ${e.message}", Toast.LENGTH_SHORT).show()
+                }
+        } else {
+            val data = hashMapOf(
+                "tourId" to tourId,
+                "nombreTour" to nombreTour,
+                "imagenUrl" to imagenUrl,
+                "precioIndividual" to (precioInd ?: 0.0),
+                "createdAt" to FieldValue.serverTimestamp()
+            )
+
+            ref.set(data, SetOptions.merge())
+                .addOnSuccessListener {
+                    isFavorite = true
+                    applyFavoriteTint(true)
+                    Toast.makeText(this, "Agregado a favoritos", Toast.LENGTH_SHORT).show()
+                }
+                .addOnFailureListener { e ->
+                    Toast.makeText(this, "Error: ${e.message}", Toast.LENGTH_SHORT).show()
+                }
+        }
+    }
+
+    private fun cargarMiRaiting(){
+        val uid = uidOrNull() ?: return
+        if (tourId.isEmpty()) return
+
+        val docId = "${uid}_${tourId}"
+        db.collection("ratings").document(docId)
+            .get()
+            .addOnSuccessListener { doc ->
+                if (doc.exists()){
+                    val r = doc.getDouble("rating") ?: 0.0
+                    puntaje = r.toFloat().coerceIn(0.5f, 5.0f)
+                    actualizarEstrellas(puntaje)
+                }
+            }
+    }
+
+    private fun guardarRating(valor : Float){
+        val uid = uidOrNull() ?: return
+        if (tourId.isEmpty()) return
+
+        val docId = "${uid}_${tourId}"
+        val data = hashMapOf(
+            "uid" to uid,
+            "tourId" to tourId,
+            "rating" to valor.toDouble(),
+            "updatedAt" to FieldValue.serverTimestamp()
+        )
+
+        db.collection("ratings").document(docId)
+            .set(data, SetOptions.merge())
+            .addOnFailureListener { e ->
+                Toast.makeText(this, "Error al guardar rating: ${e.message}", Toast.LENGTH_SHORT).show()
+            }
+    }
+
+    private fun uidOrNull() : String? = auth.currentUser?.uid
 }
