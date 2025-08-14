@@ -12,6 +12,7 @@ import com.google.android.material.textfield.MaterialAutoCompleteTextView
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.FirebaseFirestoreException
 import com.universidad.prograv.proyecto_programacionv.Modelos.Tour
 import com.universidad.prograv.proyecto_programacionv.R
 import java.text.NumberFormat
@@ -271,14 +272,37 @@ class DatosCliente : AppCompatActivity() {
             "fechaReserva" to  fechaActual
         )
 
-        db.collection("reservas")
-            .add(data)
-            .addOnSuccessListener {
-                Toast.makeText(this, "Reserva creada con exito!", Toast.LENGTH_SHORT).show()
-                finish()
+        val slotDocId = slotId(tour.id ?: "", tour.fecha ?: "", horaElegida)
+        val docRef = db.collection("reservas").document(slotDocId)
+
+        db.runTransaction { tr ->
+            val snap = tr.get(docRef)
+            if (snap.exists()){
+                throw FirebaseFirestoreException(
+                    "Ya reservado",
+                    FirebaseFirestoreException.Code.ABORTED
+                )
             }
-            .addOnFailureListener { e ->
-                Toast.makeText(this, "Error al crear reserva: ${e.message}", Toast.LENGTH_SHORT).show()
+            tr.set(docRef, data)
+            null
+        }.addOnFailureListener {
+            Toast.makeText(this, "Reserva creada con exito!", Toast.LENGTH_SHORT).show()
+            finish()
+        }.addOnFailureListener { e ->
+            if (e is FirebaseFirestoreException &&
+                e.code == FirebaseFirestoreException.Code.ABORTED) {
+                Toast.makeText(this, "Lo sentimos, este tour ya se encuentra reservado", Toast.LENGTH_LONG).show()
+            } else {
+                Toast.makeText(this, "Error al crear la reserva: ${e.message}", Toast.LENGTH_LONG).show()
             }
+        }
+    }
+
+    private fun slotId(tourId : String, fecha : String, hora : String) : String {
+        fun norm(s : String) = s
+            .lowercase(Locale.ROOT)
+            .replace("[^a-z0-9]+".toRegex(), "-")
+
+        return "tour_${norm(tourId)}__fecha_${norm(fecha)}__hora_${norm(hora)}"
     }
 }

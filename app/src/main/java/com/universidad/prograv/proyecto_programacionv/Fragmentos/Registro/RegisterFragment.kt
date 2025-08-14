@@ -34,7 +34,7 @@ class RegisterFragment : Fragment(R.layout.fragment_register) {
         binding.registerButton.setOnClickListener{
             val nombre = binding.nombreInput.text.toString().trim()
             val apellido = binding.apellidoInput.text.toString().trim()
-            val role = "Administrador"
+            val role = "Cliente"
             val email = binding.emailInput.text.toString().trim()
             val password = binding.passwordInput.text.toString().trim()
             val confirmPassword = binding.confirmPasswordInput.text.toString().trim()

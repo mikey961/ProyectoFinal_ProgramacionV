@@ -40,6 +40,7 @@ import okhttp3.Response
 import org.json.JSONObject
 import java.io.IOException
 import java.text.SimpleDateFormat
+import java.util.Calendar
 import java.util.Date
 import java.util.Locale
 
@@ -54,6 +55,7 @@ class AdminToursFragment : Fragment() {
         val view = inflater.inflate(R.layout.fragment_admin_tours, container, false)
         val recyclerView = view.findViewById<RecyclerView>(R.id.recycler_Tours)
 
+        db = FirebaseFirestore.getInstance()
         fabNuevoTour = view.findViewById(R.id.fab_NuevoTour)
 
         fabNuevoTour.setOnClickListener {
@@ -61,7 +63,10 @@ class AdminToursFragment : Fragment() {
         }
 
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
-        cargarTours(recyclerView)
+
+        eliminarToursVencidos{
+            cargarTours(recyclerView)
+        }
 
         return view
     }
@@ -188,14 +193,33 @@ class AdminToursFragment : Fragment() {
             return
         }
 
+        val sdf = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+        sdf.isLenient = false
+        val fechaDate = try { sdf.parse(fecha) } catch (e : Exception){ null }
+
+        if (fechaDate == null){
+            Toast.makeText(requireContext(), "Fecha inválida", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        val cal = Calendar.getInstance()
+        cal.time = fechaDate
+        cal.set(Calendar.HOUR_OF_DAY, 23)
+        cal.set(Calendar.MINUTE, 59)
+        cal.set(Calendar.SECOND, 59)
+        cal.set(Calendar.MILLISECOND, 999)
+        val fechaTs = Timestamp(cal.time)
+
+
         subirImagenAPostImages(requireContext(), imagenUri!!){ urlImagen ->
-            val nuevoTour = hashMapOf(
+            val nuevoTour = hashMapOf<String, Any>(
                 "nombre" to nombre,
                 "descripcion" to descripcion,
                 "duracion" to duracion,
                 "precioIndividual" to precioIndividual,
                 "precioDoble" to precioDoble,
                 "fecha" to fecha,
+                "fechaTs" to fechaTs,
                 "horarios" to horarios,
                 "imagenUrl" to urlImagen,
                 "tipoTour" to tipoTourSeleccionado,
@@ -213,12 +237,53 @@ class AdminToursFragment : Fragment() {
                 .addOnSuccessListener {
                     Toast.makeText(requireContext(), "¡Tour Guardado!", Toast.LENGTH_SHORT).show()
                     dialog.dismiss()
-                    cargarTours(requireView().findViewById(R.id.recycler_Tours))
+                    eliminarToursVencidos{
+                        view?.findViewById<RecyclerView>(R.id.recycler_Tours)?.let {
+                            cargarTours(it)
+                        }
+                    }
                 }
                 .addOnFailureListener {
                     Toast.makeText(requireContext(), "Error al guardar el tour: ${it.message}", Toast.LENGTH_SHORT).show()
                 }
         }
+    }
+
+    private fun eliminarToursVencidos(onComplete : (() -> Unit)? = null){
+        val ahora = Timestamp.now()
+
+        db.collection("tours")
+            .whereLessThan("fechaTs", ahora)
+            .get()
+            .addOnSuccessListener { snap ->
+                if (snap.isEmpty){
+                    onComplete?.invoke()
+                    return@addOnSuccessListener
+                }
+
+                val docs = snap.documents
+                val chunkSize = 450
+                var pendientes = 0
+                if (docs.isEmpty()){
+                    onComplete?.invoke()
+                    return@addOnSuccessListener
+                }
+                val chunks = docs.chunked(chunkSize)
+                pendientes = chunks.size
+
+                chunks.forEach { group ->
+                    val batch = db.batch()
+                    group.forEach { d -> batch.delete(d.reference) }
+                    batch.commit()
+                        .addOnCompleteListener {
+                            pendientes--
+                            if (pendientes == 0) onComplete?.invoke()
+                        }
+                }
+            }
+            .addOnFailureListener {
+                onComplete?.invoke()
+            }
     }
 
     private fun subirImagenAPostImages(context : Context, uri : Uri, onSuccess : (String) -> Unit){
@@ -275,15 +340,13 @@ class AdminToursFragment : Fragment() {
     }
 
     private fun cargarTours(recyclerView : RecyclerView){
-        db = FirebaseFirestore.getInstance()
-
         db.collection("tours")
             .get()
             .addOnSuccessListener { result ->
                 val lista = mutableListOf<Map<String, Any>>()
                 for (doc in result){
                     val data = doc.data.toMutableMap()
-                    data["id"] =doc.id
+                    data["id"] = doc.id
                     lista.add(data)
                 }
 
@@ -319,7 +382,7 @@ class AdminToursFragment : Fragment() {
                         db.collection("tours").document(id).delete()
                             .addOnSuccessListener {
                                 Toast.makeText(requireContext(), "Tour eliminado", Toast.LENGTH_SHORT).show()
-                                cargarTours(recyclerView)
+                                eliminarToursVencidos{ cargarTours(recyclerView) }
                             }
                             .addOnFailureListener {
                                 Toast.makeText(requireContext(), "Error al eliminar tour", Toast.LENGTH_SHORT).show()
