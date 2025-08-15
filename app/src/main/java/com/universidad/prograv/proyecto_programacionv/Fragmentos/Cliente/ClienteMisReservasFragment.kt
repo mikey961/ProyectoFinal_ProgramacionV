@@ -44,7 +44,8 @@ class ClienteMisReservasFragment : Fragment() {
             reservas,
             toursById,
             onCancelarClick = { r -> onCancelarClickCliente(r) },
-            onRenovarClick = { r -> onRenovarClickCliente(r) }
+            onRenovarClick = { r -> onRenovarClickCliente(r) },
+            onGenerarDetalle = { r -> onGenerarDetalleReserva(r) }
         )
         rv_Reservas.adapter = adaptador
 
@@ -155,6 +156,21 @@ class ClienteMisReservasFragment : Fragment() {
             }
             .setNegativeButton("Cancelar", null)
             .show()
+    }
+
+    private fun onGenerarDetalleReserva(reserva : Reserva) {}
+
+    private fun generarQR(texto: String, size: Int): android.graphics.Bitmap {
+        val matrix = com.google.zxing.MultiFormatWriter().encode(
+            texto, com.google.zxing.BarcodeFormat.QR_CODE, size, size
+        )
+        val bmp = android.graphics.Bitmap.createBitmap(size, size, android.graphics.Bitmap.Config.ARGB_8888)
+        for (x in 0 until size) {
+            for (y in 0 until size) {
+                bmp.setPixel(x, y, if (matrix[x, y]) android.graphics.Color.BLACK else android.graphics.Color.WHITE)
+            }
+        }
+        return bmp
     }
 
     override fun onDestroy() {

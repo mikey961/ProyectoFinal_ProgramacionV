@@ -60,6 +60,17 @@
             android:layout_marginTop="4dp"/>
 
         <com.google.android.material.button.MaterialButton
+            android:id="@+id/buttonGenerarDetalle"
+            style="@style/Widget.Material3.Button.OutlinedButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Generar detalle"
+            android:textAllCaps="false"
+            android:textColor="@color/white"
+            android:backgroundTint="@color/Anaranjado"
+            android:layout_marginTop="12dp"/>
+
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/buttonCancelarReserva"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

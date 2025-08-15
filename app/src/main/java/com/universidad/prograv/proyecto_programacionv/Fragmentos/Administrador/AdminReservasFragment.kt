@@ -11,6 +11,8 @@ import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ListenerRegistration
 import com.universidad.prograv.proyecto_programacionv.Fragmentos.Adaptadores.ReservasAdminAdapter
@@ -30,11 +32,7 @@ class AdminReservasFragment : Fragment() {
     private var filtroCorreoSeleccionado: String? = null
     private var listener: ListenerRegistration? = null
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.fragment_admin_reservas, container, false)
 
         rv_ReservasAdmin = view.findViewById(R.id.rv_AdminReservas)
@@ -49,6 +47,7 @@ class AdminReservasFragment : Fragment() {
         rv_ReservasAdmin.adapter = adaptador
 
         configurarFiltroUI()
+        borrarReservasVencidasLocal()
         escucharReservas()
 
         return view
@@ -153,11 +152,19 @@ class AdminReservasFragment : Fragment() {
             .setMessage("¿Desea cancelar esta reserva?")
             .setPositiveButton("Cancelar reserva") { _, _ ->
                 val id = reserva.id ?: return@setPositiveButton
+
+                val cal = java.util.Calendar.getInstance().apply {
+                    add(java.util.Calendar.HOUR_OF_DAY, 72)
+                }
+                val expiresAt = com.google.firebase.Timestamp(cal.time)
                 db.collection("reservas").document(id)
                     .update(
                         mapOf(
                             "estado" to "cancelada",
-                            "cancelRequested" to false
+                            "cancelRequested" to false,
+                            "renewRequested" to false,
+                            "cancelledAt" to FieldValue.serverTimestamp(),
+                            "expiresAt" to expiresAt
                         )
                     )
                     .addOnSuccessListener {
@@ -172,7 +179,6 @@ class AdminReservasFragment : Fragment() {
     }
 
     private fun onRenovarComoAdmin(reserva: Reserva) {
-        // Sólo si el cliente lo solicitó
         if (reserva.renewRequested != true) {
             Toast.makeText(requireContext(), "El cliente no ha solicitado renovar esta reserva.", Toast.LENGTH_SHORT).show()
             return
@@ -189,7 +195,8 @@ class AdminReservasFragment : Fragment() {
                         mapOf(
                             "estado" to "activa",
                             "renewRequested" to false,
-                            "cancelRequested" to false
+                            "cancelRequested" to false,
+                            "expiresAt" to null
                         )
                     )
                     .addOnSuccessListener {
@@ -201,6 +208,20 @@ class AdminReservasFragment : Fragment() {
             }
             .setNegativeButton("Atrás", null)
             .show()
+    }
+
+    private fun borrarReservasVencidasLocal() {
+        val ahora = com.google.firebase.Timestamp.now()
+        db.collection("reservas")
+            .whereEqualTo("estado", "cancelada")
+            .whereLessThan("expiresAt", ahora)
+            .get()
+            .addOnSuccessListener { snap ->
+                if (snap.isEmpty) return@addOnSuccessListener
+                val batch = db.batch()
+                snap.documents.forEach { batch.delete(it.reference) }
+                batch.commit()
+            }
     }
 
     private inline fun String?.ifNullOrBlank(fallback: () -> String): String {

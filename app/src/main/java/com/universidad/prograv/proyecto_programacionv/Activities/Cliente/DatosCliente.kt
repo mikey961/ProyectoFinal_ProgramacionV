@@ -1,6 +1,11 @@
 package com.universidad.prograv.proyecto_programacionv.Activities.Cliente
 
+import android.graphics.Typeface
 import android.os.Bundle
+import android.text.SpannableStringBuilder
+import android.text.Spanned
+import android.text.style.StrikethroughSpan
+import android.text.style.StyleSpan
 import android.view.View
 import android.widget.ArrayAdapter
 import android.widget.TextView
@@ -11,6 +16,7 @@ import com.google.android.material.checkbox.MaterialCheckBox
 import com.google.android.material.textfield.MaterialAutoCompleteTextView
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.FirebaseFirestoreException
 import com.universidad.prograv.proyecto_programacionv.Modelos.Tour
@@ -19,6 +25,7 @@ import java.text.NumberFormat
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import java.util.concurrent.TimeUnit
 import kotlin.math.max
 
 class DatosCliente : AppCompatActivity() {
@@ -53,6 +60,9 @@ class DatosCliente : AppCompatActivity() {
 
     private var precioInd = 0.0
     private var precioDob = 0.0
+
+    private var isNewUserDiscount = false
+    private val auth = FirebaseAuth.getInstance()
 
     private val currency : NumberFormat by lazy {
         NumberFormat.getCurrencyInstance(Locale.US)
@@ -134,6 +144,7 @@ class DatosCliente : AppCompatActivity() {
             finish()
         }
 
+        comprobarDescuentoUsuario()
         actualizarTotal()
     }
 
@@ -197,6 +208,24 @@ class DatosCliente : AppCompatActivity() {
         actualizarTotal()
     }
 
+    private fun comprobarDescuentoUsuario(){
+        val uid = auth.currentUser?.uid ?: return
+
+        db.collection("users").document(uid)
+            .get()
+            .addOnSuccessListener{ doc ->
+                val now = System.currentTimeMillis()
+                val createdAt = doc.getLong("createdAt") ?: 0L
+                val treintaDiasMs = 30L * 24 * 60 * 60 * 1000
+                isNewUserDiscount = createdAt > 0L && now < (createdAt + treintaDiasMs)
+                actualizarTotal()
+            }
+            .addOnFailureListener {
+                isNewUserDiscount = false
+                actualizarTotal()
+            }
+    }
+
     private fun actualizarTotal(){
         val precioInd = tour.precioIndividual ?: 0.0
         val precioDob = tour.precioDoble ?: 0.0
@@ -211,7 +240,27 @@ class DatosCliente : AppCompatActivity() {
 
         tv_SubTotalIndividual.text = "Individual: ${currency.format(subtotalInd)}"
         tv_SubTotalDoble.text = "Doble: ${currency.format(subtotalDob)}"
-        tvTotal.text = "Total: ${currency.format(total)}"
+
+        if (isNewUserDiscount && total > 0.0){
+            val totalOriginal = currency.format(total)
+            val totalDescuento = currency.format(total * 0.5)
+
+            val sb = SpannableStringBuilder()
+            sb.append("Total: ")
+
+            val starOriginal = sb.length
+            sb.append(totalOriginal)
+            sb.setSpan(StrikethroughSpan(), starOriginal, sb.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+            sb.append(" ")
+
+            val starDescuento = sb.length
+            sb.append(totalDescuento)
+            sb.setSpan(StyleSpan(Typeface.BOLD), starDescuento, sb.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+
+            tvTotal.text = sb
+        } else {
+            tvTotal.text = "Total: ${currency.format(total)}"
+        }
     }
 
     private fun onReservar(){
@@ -251,49 +300,111 @@ class DatosCliente : AppCompatActivity() {
         val subTotalDob = if (cbDoble.isChecked) precioDob * (selectedDob / 2) else 0.0
         val total = subTotalInd + subTotalDob
 
-        val formatoFecha = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
-        val fechaActual = formatoFecha.format(Date())
+        val uid = FirebaseAuth.getInstance().currentUser?.uid
+        val usersRef = db.collection("users").document(uid ?: "_no_uid_")
 
-        val data = hashMapOf(
-            "idTour" to (tour.id ?: ""),
-            "nombreTour" to (tour.nombre ?: ""),
-            "nombre" to nombreStr,
-            "apellido" to apellidoStr,
-            "correo" to correoStr,
-            "precioIndividual" to precioInd,
-            "precioDoble" to precioDob,
-            "cantidadIndividual" to selectedInd,
-            "cantidadDoble" to selectedDob,
-            "subTotalIndividual" to subTotalInd,
-            "subTotalDoble" to subTotalDob,
-            "total" to total,
-            "fechaTour" to (tour.fecha ?: ""),
-            "horaTour" to horaElegida,
-            "fechaReserva" to  fechaActual
-        )
+        usersRef.get().addOnSuccessListener { userDoc ->
+            val createdAtMs = userDoc.getLong("createdAt") ?: 0L
+            val now = System.currentTimeMillis()
+            val treintaDiasMs = TimeUnit.DAYS.toMillis(30)
 
-        val slotDocId = slotId(tour.id ?: "", tour.fecha ?: "", horaElegida)
-        val docRef = db.collection("reservas").document(slotDocId)
+            val aplicaWelcome50 = createdAtMs > 0L && now < (createdAtMs + treintaDiasMs)
+            val totalCobrado = if (aplicaWelcome50) total * 0.5 else total
 
-        db.runTransaction { tr ->
-            val snap = tr.get(docRef)
-            if (snap.exists()){
-                throw FirebaseFirestoreException(
-                    "Ya reservado",
-                    FirebaseFirestoreException.Code.ABORTED
-                )
+            val formatoFecha = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+            val fechaActual = formatoFecha.format(Date())
+
+            val data = hashMapOf(
+                "idTour" to (tour.id ?: ""),
+                "nombreTour" to (tour.nombre ?: ""),
+                "nombre" to nombreStr,
+                "apellido" to apellidoStr,
+                "correo" to correoStr,
+                "precioIndividual" to precioInd,
+                "precioDoble" to precioDob,
+                "cantidadIndividual" to selectedInd,
+                "cantidadDoble" to selectedDob,
+                "subTotalIndividual" to subTotalInd,
+                "subTotalDoble" to subTotalDob,
+                "total" to total,
+                "totalCobrado" to totalCobrado,
+                "descuento" to aplicaWelcome50,
+                "fechaTour" to (tour.fecha ?: ""),
+                "horaTour" to horaElegida,
+                "fechaReserva" to  fechaActual
+            )
+
+            val slotDocId = slotId(tour.id ?: "", tour.fecha ?: "", horaElegida)
+            val docRef = db.collection("reservas").document(slotDocId)
+
+            db.runTransaction{ tr ->
+                val snap = tr.get(docRef)
+                if (snap.exists()){
+                    throw  FirebaseFirestoreException(
+                        "Ya reservado",
+                        FirebaseFirestoreException.Code.ABORTED
+                    )
+                }
+                tr.set(docRef, data)
+                null
+            }.addOnSuccessListener {
+                Toast.makeText(this, "Reserva creada con exito!", Toast.LENGTH_SHORT).show()
+                finish()
+            }.addOnFailureListener { e ->
+                if (e is FirebaseFirestoreException &&
+                    e.code == FirebaseFirestoreException.Code.ABORTED) {
+                    Toast.makeText(this, "Lo sentimos, este tour ya se encuentra reservado", Toast.LENGTH_LONG).show()
+                } else {
+                    Toast.makeText(this, "Error al crear la reserva: ${e.message}", Toast.LENGTH_LONG).show()
+                }
             }
-            tr.set(docRef, data)
-            null
-        }.addOnFailureListener {
-            Toast.makeText(this, "Reserva creada con exito!", Toast.LENGTH_SHORT).show()
-            finish()
         }.addOnFailureListener { e ->
-            if (e is FirebaseFirestoreException &&
-                e.code == FirebaseFirestoreException.Code.ABORTED) {
-                Toast.makeText(this, "Lo sentimos, este tour ya se encuentra reservado", Toast.LENGTH_LONG).show()
-            } else {
-                Toast.makeText(this, "Error al crear la reserva: ${e.message}", Toast.LENGTH_LONG).show()
+            val formatoFecha = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+            val fechaActual = formatoFecha.format(Date())
+
+            val dataFallback = hashMapOf(
+                "idTour" to (tour.id ?: ""),
+                "nombreTour" to (tour.nombre ?: ""),
+                "nombre" to nombreStr,
+                "apellido" to apellidoStr,
+                "correo" to correoStr,
+                "precioIndividual" to precioInd,
+                "precioDoble" to precioDob,
+                "cantidadIndividual" to selectedInd,
+                "cantidadDoble" to selectedDob,
+                "subTotalIndividual" to subTotalInd,
+                "subTotalDoble" to subTotalDob,
+                "total" to total,
+                "totalCobrado" to total,
+                "descuento" to false,
+                "fechaTour" to (tour.fecha ?: ""),
+                "horaTour" to horaElegida,
+                "fechaReserva" to  fechaActual
+            )
+
+            val slotDocId = slotId(tour.id ?: "", tour.fecha ?: "", horaElegida)
+            val docRef = db.collection("reservas").document(slotDocId)
+
+            db.runTransaction{ tr ->
+                val snap = tr.get(docRef)
+                if (snap.exists()){
+                    throw  FirebaseFirestoreException(
+                        "Ya reservado",
+                        FirebaseFirestoreException.Code.ABORTED
+                    )
+                }
+                tr.set(docRef, dataFallback)
+                null
+            }.addOnSuccessListener {
+                Toast.makeText(this, "Reserva creada con exito!", Toast.LENGTH_SHORT).show()
+                finish()
+            }.addOnFailureListener { ex ->
+                if (ex is FirebaseFirestoreException &&
+                    ex.code == FirebaseFirestoreException.Code.ABORTED) {
+                    Toast.makeText(this, "Lo sentimos, este tour ya se encuentra reservado", Toast.LENGTH_LONG).show()
+                } else {
+                    Toast.makeText(this, "Error al crear la reserva: ${e.message}", Toast.LENGTH_LONG).show()
+                }
             }
         }
     }

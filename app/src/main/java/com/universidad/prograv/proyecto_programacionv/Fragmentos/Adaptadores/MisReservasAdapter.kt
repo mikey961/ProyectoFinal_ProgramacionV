@@ -13,7 +13,8 @@ class MisReservasAdapter(
     private val listaReservas: MutableList<Reserva>,
     private var toursById: Map<String, Tour>,
     private val onCancelarClick: (Reserva) -> Unit,
-    private val onRenovarClick: (Reserva) -> Unit
+    private val onRenovarClick: (Reserva) -> Unit,
+    private val onGenerarDetalle: (Reserva) -> Unit
 ) : RecyclerView.Adapter<MisReservasAdapter.ReservaViewHolder>() {
 
     inner class ReservaViewHolder(v: View) : RecyclerView.ViewHolder(v) {
@@ -22,8 +23,8 @@ class MisReservasAdapter(
         val vtCorreoUsuario: TextView = v.findViewById(R.id.tv_CorreoUsuarioReserva)
         val vtFechaHoraTour: TextView = v.findViewById(R.id.tv_FechaHoraTourReserva)
         val tvSolicitud: TextView = v.findViewById(R.id.tv_SolicitudCliente)
-        val btnAccion: com.google.android.material.button.MaterialButton =
-            v.findViewById(R.id.buttonCancelarReserva)
+        val btnAccion: com.google.android.material.button.MaterialButton = v.findViewById(R.id.buttonCancelarReserva)
+        val btnGenerar: com.google.android.material.button.MaterialButton = v.findViewById(R.id.buttonGenerarDetalle)
     }
 
     override fun onCreateViewHolder(p: ViewGroup, vt: Int) =
@@ -40,6 +41,8 @@ class MisReservasAdapter(
         h.vtFechaHoraTour.text = "${t?.fecha.orEmpty()} - ${r.horaTour.orEmpty()}"
 
         h.tvSolicitud.visibility = View.GONE
+
+        h.btnGenerar.setOnClickListener { onGenerarDetalle(r) }
 
         val ctx = h.itemView.context
         if (r.estado.equals("cancelada", true)) {
